@@ -1,0 +1,16 @@
+{
+	"servers": {
+		// "my-mcp-server-3eb23": {
+		// 	"type": "stdio",
+		// 	"command": "/opt/miniconda3/envs/work/bin/python3",
+		// 	"args": [
+		// 		"mcp_weather_server/main.py"
+		// 	]
+		// },
+		// "my-mcp-server-3c053": {
+		// 	"url": "http://0.0.0.0:8080/sse",
+		// 	"type": "http"
+		// }
+	},
+	"inputs": []
+}
