@@ -12,7 +12,6 @@ import traceback
 from collections.abc import AsyncIterator, Sequence
 from typing import Any, Dict, Optional
 
-from fastapi import Response
 from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -24,18 +23,18 @@ from mcp.server.sse import SseServerTransport
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.types import EmbeddedResource, ImageContent, TextContent, Tool
 # Import tool handlers
-from tools.toolhandler import ToolHandler
-from tools.tools_weather import (
+from .tools.toolhandler import ToolHandler
+from .tools.tools_weather import (
     GetCurrentWeatherToolHandler,
     GetWeatherByDateRangeToolHandler,
     GetWeatherDetailsToolHandler,
 )
-from tools.tools_time import (
+from .tools.tools_time import (
     GetCurrentDateTimeToolHandler,
     GetTimeZoneInfoToolHandler,
     ConvertTimeToolHandler,
 )
-from tools.tools_air_quality import (
+from .tools.tools_air_quality import (
     GetAirQualityToolHandler,
     GetAirQualityDetailsToolHandler,
 )
@@ -118,8 +117,8 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
 
     sse = SseServerTransport("/messages/")
 
-    async def handle_mcp(request: Request) -> Response:
-        """Handle requests to the /sse endpoint"""
+    async def handle_mcp(request: Request) -> None:
+        """Handle requests to the /mcp endpoint"""
         async with sse.connect_sse(
                 request.scope,
                 request.receive,
@@ -131,13 +130,10 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
                 mcp_server.create_initialization_options(),
             )
 
-        # Return empty response to avoid NoneType callable errors on disconnect
-        return Response()
-
     app = Starlette(
         debug=debug,
         routes=[
-            Route("/sse", endpoint=handle_mcp, methods=["GET"]),
+            Route("/sse", endpoint=handle_mcp),
             Mount("/messages/", app=sse.handle_post_message),
         ],
     )
